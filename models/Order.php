@@ -19,6 +19,16 @@ use yii\db\ActiveRecord;
 class Order extends ActiveRecord
 {
     /**
+     * @var string
+     */
+    public $username;
+
+    /**
+     * @var int
+     */
+    public $product_number;
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -44,7 +54,7 @@ class Order extends ActiveRecord
         return [
             'id' => 'ID',
             'product_number' => 'Количество товаров',
-            'user' => 'Пользователь',
+            'username' => 'Пользователь',
             'created_at' => 'Дата создания',
         ];
     }
@@ -86,13 +96,5 @@ class Order extends ActiveRecord
     public function getOrderItems()
     {
         return $this->hasMany(OrderItem::className(), ['order_id' => 'id']);
-    }
-
-    /**
-     * @return int
-     */
-    public function getProductNumber()
-    {
-        return $this->getOrderItems()->sum('quantity');
     }
 }

@@ -23,7 +23,7 @@ use yii\widgets\ActiveForm;
 
     <div class="form-group">
         <?= Html::submitButton('Добавить продукт', ['class' => 'btn btn-success']) ?>
-        <span id="loading">Подождите...</span>
+        <span id="message"></span>
     </div>
 
     <?php ActiveForm::end(); ?>

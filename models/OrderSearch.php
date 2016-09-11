@@ -3,7 +3,6 @@
 namespace app\models;
 
 use Yii;
-use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
 /**
@@ -17,17 +16,8 @@ class OrderSearch extends Order
     public function rules()
     {
         return [
-            [['created_at'], 'safe'],
+            [['created_at', 'product_number'], 'safe'],
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function scenarios()
-    {
-        // bypass scenarios() implementation in the parent class
-        return Model::scenarios();
     }
 
     /**
@@ -39,11 +29,19 @@ class OrderSearch extends Order
      */
     public function search($params)
     {
-        $query = Order::find()->where(['user_id' => Yii::$app->user->identity->id]);
+        $query = Order::find()
+            ->select('"order".*, "user".username, SUM("order_item".quantity) as product_number')
+            ->leftJoin(OrderItem::tableName(), '"order".id = "order_item".order_id')
+            ->leftJoin(ShopUser::tableName(), '"order".user_id = "user".id')
+            ->where(['user_id' => Yii::$app->user->identity->id])
+            ->groupBy('"order".id, "user".username');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => false
+            'sort' => [
+                'defaultOrder' => ['created_at' => SORT_ASC],
+                'attributes' => ['id', 'username', 'product_number', 'created_at']
+            ]
         ]);
 
         $this->load($params);
@@ -53,9 +51,11 @@ class OrderSearch extends Order
             return $dataProvider;
         }
 
-        if (!empty($this->created_at)) {
-            $query->andFilterWhere(['to_char(to_timestamp(created_at), \'DD.MM.YYYY\')' => $this->created_at]);
+        if (!empty($this->product_number)) {
+            $query->having(['=', 'SUM("order_item".quantity)', $this->product_number]);
         }
+
+        $query->andFilterWhere(['to_char(to_timestamp(created_at), \'DD.MM.YYYY\')' => $this->created_at]);
 
         return $dataProvider;
     }

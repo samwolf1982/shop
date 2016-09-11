@@ -9,6 +9,7 @@ use yii\filters\AccessControl;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 use yii\web\Controller;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Controller for ajax-requests of orders
@@ -42,7 +43,9 @@ class AjaxOrderController extends Controller
      */
     public function actionLoadTypes($id)
     {
-        if (Yii::$app->request->isAjax) {
+        $request = Yii::$app->getRequest();
+
+        if ($request->isAjax && $request->isPost) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             return Type::getList($id);
         } else {
@@ -52,7 +55,8 @@ class AjaxOrderController extends Controller
 
     /**
      * Creates a new order items
-     * @return mixed
+     * @return OrderItem
+     * @throws ForbiddenHttpException|ServerErrorHttpException
      */
     public function actionCreateItem()
     {
@@ -72,7 +76,11 @@ class AjaxOrderController extends Controller
 
             if ($model->load($request->post()) && $model->save()) {
                 return $model;
+            } else {
+                throw new ServerErrorHttpException();
             }
+        } else {
+            throw new ForbiddenHttpException();
         }
     }
 }

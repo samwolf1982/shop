@@ -78,7 +78,10 @@ class OrderController extends Controller
         $orderItem->order_id = $order->id;
         $orderItemProvider = new ActiveDataProvider([
             'query' => OrderItem::find()->where(['order_id' => $order->id]),
-            'sort' => false
+            'sort' => [
+                'defaultOrder' => ['id' => SORT_ASC],
+                'attributes' => ['id']
+            ]
         ]);
 
         return $this->render('view', [

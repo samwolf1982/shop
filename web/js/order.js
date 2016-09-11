@@ -1,7 +1,7 @@
 var $orderItemForm = $('#order-item-form');
 var $productSelect = $('#orderitem-product_id');
 var $typeSelect = $('#orderitem-type_id');
-var $loading = $('#loading');
+var $message = $('#message');
 
 $productSelect.on('change', function() {
 
@@ -20,6 +20,12 @@ $productSelect.on('change', function() {
                     });
                     $typeSelect.prop('disabled', false);
                 }
+            },
+            error: function() {
+                $message.text('Произошла ошибка');
+                setTimeout(function() {
+                    $message.text('');
+                }, 3000)
             }
         });
     }
@@ -30,16 +36,25 @@ $orderItemForm.on('beforeSubmit', function () {
     if (!$typeSelect.prop('disabled') && $typeSelect.val() == '')
         return false;
 
-    $loading.show();
+    $message.text('Подождите...');
+
     $.ajax({
         url: '/ajax-order/create-item',
         type: 'POST',
         data: $('#order-item-form').serialize(),
-        success: function(data) {
+        success: function() {
             $.pjax.reload({
                 container: '#pjax-container',
                 timeout: 1000
             });
+            $orderItemForm.data('yiiActiveForm').validated = false;
+        },
+        error: function() {
+            $message.text('Произошла ошибка');
+            setTimeout(function() {
+                $message.text('');
+            }, 3000);
+            $orderItemForm.data('yiiActiveForm').validated = false;
         }
     });
 });
@@ -49,5 +64,5 @@ $orderItemForm.on('submit', function(e) {
 });
 
 $(document).on('pjax:end', function() {
-    $loading.hide();
+    $message.text('');
 });

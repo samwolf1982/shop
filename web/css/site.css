@@ -94,7 +94,6 @@ a.desc:after {
     border-color: #CCCCCC;
 }
 
-#loading {
-    display: none;
+#message {
     margin-left: 10px;
 }

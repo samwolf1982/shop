@@ -18,6 +18,8 @@ $this->title = 'Список заказов';
         <?= Html::a('Создать заказ', ['view', 'id' => uniqid()], ['class' => 'btn btn-success']) ?>
     </p>
 
+    <?php \yii\widgets\Pjax::begin(); ?>
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -25,24 +27,20 @@ $this->title = 'Список заказов';
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'id',
-            [
-                'attribute' => 'user',
-                'value' => function ($model) {
-                    return $model->getUserName();
-                }
-            ],
-            [
-                'attribute' => 'product_number',
-                'value' => function ($model) {
-                    return $model->getProductNumber();
-                }
-            ],
+            'username',
+            'product_number',
             [
                 'attribute' => 'created_at',
                 'value' => function ($model) {
+                    /** @var \app\models\Order $model */
                     return date("d.m.Y H:i:s",  $model->created_at);
                 },
-                'filter' => DatePicker::widget(['model' => $searchModel, 'attribute' => 'created_at', 'language' => 'ru', 'dateFormat' => 'dd.MM.yyyy']),
+                'filter' => DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'created_at',
+                    'language' => 'ru',
+                    'dateFormat' => 'dd.MM.yyyy'
+                ]),
                 'format' => 'html',
             ],
             [
@@ -51,5 +49,7 @@ $this->title = 'Список заказов';
             ],
         ],
     ]); ?>
+
+    <?php \yii\widgets\Pjax::end(); ?>
 
 </div>

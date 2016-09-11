@@ -43,18 +43,21 @@ OrderAsset::register($this);
                 [
                     'attribute' => 'product',
                     'value' => function ($model) {
+                        /** @var \app\models\OrderItem $model */
                         return $model->getProductName();
                     }
                 ],
                 [
                     'attribute' => 'type',
                     'value' => function ($model) {
+                        /** @var \app\models\OrderItem $model */
                         return $model->getTypeName();
                     }
                 ],
                 [
                     'attribute' => 'quantity',
                     'value' => function ($model) {
+                        /** @var \app\models\OrderItem $model */
                         return $model->quantity;
                     }
                 ],
